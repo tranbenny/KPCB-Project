@@ -1,0 +1,7 @@
+node_modules
+public/css/images
+public/css/ammap.css
+public/js/ammap.js
+public/js/ammap_amcharts_extension.js
+public/js/worldHigh.js
+public/bower_components
