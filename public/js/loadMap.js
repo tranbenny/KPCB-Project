@@ -4,16 +4,25 @@ AmCharts.ready(function() {
 
 	var dataProvider = {
 		map : "worldHigh",
-		getAreasFromMap : true
+		getAreasFromMap : true, 
 	};
 
 	map.dataProvider = dataProvider;
 
 	
 	map.areasSettings = {
-		autoZoom : true,
-		selectedColor: "#CC000"
+		autoZoom : false,
+		selectedColor: "#CC000",
+		selectable : true,
 	};
+
+	map.addListener("clickMapObject", function(event) {
+		console.log(event.mapObject.enTitle);
+		// load up a little text box with its name 
+		$('#modal-content').empty();
+		$('#modal-content').append(event.mapObject.enTitle);
+		$('#myModal').modal('show');
+	});
 
 	map.write("mapdiv");
 });
