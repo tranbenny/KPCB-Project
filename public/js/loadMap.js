@@ -17,12 +17,38 @@ AmCharts.ready(function() {
 	};
 
 	map.addListener("clickMapObject", function(event) {
-		console.log(event.mapObject.enTitle);
+		//console.log(event.mapObject.enTitle);
 		// load up a little text box with its name 
-		$('#modal-content').empty();
-		$('#modal-content').append(event.mapObject.enTitle);
+		$('#modal-body').empty();
+		$('#modal-body').append(event.mapObject.enTitle);
 		$('#myModal').modal('show');
 	});
 
 	map.write("mapdiv");
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
