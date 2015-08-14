@@ -10,13 +10,16 @@ var apiInfo= {
 
 // url for agriculture definition by world bank
 var defURl = "http://api.worldbank.org/topic/1?per_page=100&format=json";
-// crop production index
-var cropURL = "http://api.worldbank.org/countries/PHL/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json"
 
 
-function findInfo(callback) {
+
+var baseURL = "http://api.worldbank.org/countries/";
+var endURL = "/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json";
+
+function findInfo(location, callback) {
 	var data;
-	request(cropURL, function(err, res, body) {
+	var url = baseURL + location + endURL;
+	request(url, function(err, res, body) {
 		if (!err && res.statusCode == 200) {
 			var data = JSON.parse(body);
 			callback(extractInfo(data));
@@ -34,8 +37,7 @@ function extractInfo(data) {
 			result = result + "Year: " + value.date + ", Index Value: " + value.value + "\n";
 		}
 	});
-	return(result);
-
+	return(result); // string
 };
 
 var apiInfo = {

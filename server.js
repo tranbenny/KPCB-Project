@@ -4,8 +4,11 @@ var mainPageRoutes = require('./app/routes/routes');
 var api = require('./app/routes/apiRoutes');
 
 
+app.use(express.static(__dirname + '/public'));
+
 app.use('/', mainPageRoutes);
 app.use('/api', api);
+
 /*
 app.get('/', function(req, res) {
 	res.send('Hello World!');
