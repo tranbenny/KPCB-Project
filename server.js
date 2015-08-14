@@ -1,9 +1,11 @@
 var express = require('express');
 var app = express();
-var routes = require('./app/routes/routes');
+var mainPageRoutes = require('./app/routes/routes');
+var api = require('./app/routes/apiRoutes');
 
 
-app.use('/', routes);
+app.use('/', mainPageRoutes);
+app.use('/api', api);
 /*
 app.get('/', function(req, res) {
 	res.send('Hello World!');
