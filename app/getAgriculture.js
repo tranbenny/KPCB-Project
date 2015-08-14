@@ -38,11 +38,6 @@ function extractInfo(data) {
 
 };
 
-
-
-
-
-
 var apiInfo = {
 	apiInfo : apiInfo,
 	findInfo : findInfo	

@@ -16,3 +16,19 @@ router.get('/agriculture', function(req, res) {
 });
 
 module.exports = router;
+
+
+var kivaCategories = {
+	"Agriculture" : {},
+	"Women" : {}, 
+	"Education" : {},
+	"Health" : {},
+	"Single Parents" : {}, 
+	"Shelter" : {},
+	"Retail Businesses" : {},
+	"Food" : {}
+};
+
+
+
+
