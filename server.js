@@ -2,9 +2,11 @@ var express = require('express');
 var app = express();
 var mainPageRoutes = require('./app/routes/routes');
 var api = require('./app/routes/apiRoutes');
+// var bodyParser = require('body-parser');
 
 
 app.use(express.static(__dirname + '/public'));
+// app.use(bodyParser());
 
 app.use('/', mainPageRoutes);
 app.use('/api', api);

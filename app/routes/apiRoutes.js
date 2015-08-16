@@ -2,12 +2,32 @@
 
 var express = require('express');
 var router = express.Router();
+var locInfo = require("../countryData"); 
 var agInfo = require("../getAgriculture");
 
 router.get('/', function(req, res) {
 	// need to configure this to send the index page 
 	res.send('Hello World, this is a different page');
 });
+
+
+// needs to send an array of countries
+// response sends back json object with country, latitude and longitude values
+router.get("/Location", function(req, res) {
+	var countries = req.query.countryNames; // object of country names
+	var allCountries = locInfo.countryData; // array of objects
+	var result = {};
+	allCountries.forEach(function(value, index, array) {
+		if (countries.indexOf(value.country) != -1) {
+			result[value.country] = {
+				lat : value.latitude,
+				lon : value.longitude
+			};
+		}
+	});
+	res.send(result);
+});
+
 
 // finish the function before returning the response
 router.get('/Agriculture', function(req, res) {
