@@ -5,6 +5,9 @@ var router = express.Router();
 var locInfo = require("../countryData"); 
 var agInfo = require("../getAgriculture");
 
+// agInfo.apiInfo = kiva categories 
+// agInfo.findInfo(location, callback) : finds the appropriate information
+
 router.get('/', function(req, res) {
 	// need to configure this to send the index page 
 	res.send('Hello World, this is a different page');
@@ -28,6 +31,9 @@ router.get("/Location", function(req, res) {
 	res.send(result);
 });
 
+router.get('/:sector', function(req, res) {
+	var sector = req.params.sector;
+});
 
 // finish the function before returning the response
 router.get('/Agriculture', function(req, res) {
@@ -35,6 +41,23 @@ router.get('/Agriculture', function(req, res) {
 	agInfo.findInfo(location, function(data) {
 		res.send(data); // sends string
 	});
+});
+
+
+router.get('/Women', function(req, res) {
+
+});
+
+router.get('/Education', function(req, res) {
+
+});
+
+router.get("/Health", function(req, res) {
+
+});
+
+router.get('/Single+Parents', function(req, res) {
+
 });
 
 module.exports = router;

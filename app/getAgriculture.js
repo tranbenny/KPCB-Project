@@ -8,6 +8,47 @@ var apiInfo= {
 	 // crop production index, food production index, agriculture value added per worker
 };
 
+var kivaCategories = {
+	"Agriculture" : {
+		"World Bank" : [
+			"Agriculture & Rural Development", 
+			// variables: crop production index, agriculture value added?\
+			"Economy & Growth", // agriculture value added
+			"Gender"] // % employments in agriculture for male and female
+ 	},
+	"Women" : {
+		"World Bank" : ["Gender"] 
+		// Variables: 
+		// children in employment, female
+		// long term unemployment, female 
+		// children in employment, study and work : female 
+		// employees, female
+	}, 
+	"Education" : {
+		"World Bank" : ["Education", 
+		// children out of school, literacy rate, persistence to last grade of primary
+		// primary completion rate
+		// progression to secondary school 
+		// school enrollment
+		// unemployment rate 
+		"Gender"] // Literacy rates for youth female and youth males
+	},
+	"Health" : {
+		"World Bank" : ["Agriculture", // improved water source ?
+		"Aid Effectiveness", // improved sanitation facilities
+		// life expenctancy at birth, malnutrition prevalence, mortality rate
+		"Gender", // : Life Expectancy at birth, female and male
+		"Infrastructure"] // improved water sources, rural and urban
+	},
+	"Single Parents" : {
+		"World Bank" : ["Aid Effectiveness"] // Maternal mortality rate, teenage mothers
+		// pregnant women receiving prenatal care 
+	}, 
+	"Shelter" : {},
+	"Retail Businesses" : {},
+	"Food" : {}
+};
+
 // url for agriculture definition by world bank
 var defURl = "http://api.worldbank.org/topic/1?per_page=100&format=json";
 
@@ -41,7 +82,7 @@ function extractInfo(data) {
 };
 
 var apiInfo = {
-	apiInfo : apiInfo,
+	apiInfo : kivaCategories,
 	findInfo : findInfo	
 };
 

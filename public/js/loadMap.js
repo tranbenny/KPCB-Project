@@ -3,16 +3,16 @@
 
 
 // Plan
-// make api call, send information about countries
-// api call should return an object with all the countries and latitude and longitude values
-// need to configure new api route
+// need to figure out a system that maps sectors and locations together 
 
-var loanInformation = {};
-var countries = [];
-var countryLocations = {};
+var loanInformation = {}; // Key: UserID, Value:Array of loans
+var countries = []; // array of all countries
+var countryLocations = {}; // Key : countries, value : longitude/latitude values 
+// returns most recent loans made 
 var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
+var sectorLocations = {}; // Key : country, value : array of sectors
 
-// will get object, result.lending_actions == array of objects
+
 
 function findAllInformation(callback) {
 	var loadLoanOptions = {
@@ -31,7 +31,7 @@ function findAllInformation(callback) {
 			// loanInformation = object where key is lenderID and value is array of all loans
 		},
 		error : function(err) {
-			promise.reject(new Error(err));
+			console.log("Error occured" + err);
 		}
 	};
 	$.ajax(recentLoansURL, loadLoanOptions);
@@ -51,8 +51,10 @@ function drawMap() {
 		images : [],
 	};
 
+	// adds all the location values to draw circles
+	// map location and sector values <--
 	for (var userID in loanInformation) {
-		var loans = loanInformation[userID]; // array
+		var loans = loanInformation[userID]; 
 		loans.forEach(function(value, index, array) {
 			var country = value.location.country_code;
 			var lat = countryLocations[country].lat;
@@ -64,10 +66,13 @@ function drawMap() {
 				longitude : lon
 			}; 
 			dataProvider.images.push(image);
+			if (value.location.country in sectorLocations) {
+				sectorLocations[value.location.country].push(value.sector);
+			} else {
+				sectorLocations[value.location.country] = [value.sector];
+			}
 		});
 	}
-
-	// console.log(countryLocations);
 	
 	map.dataProvider = dataProvider;
 
@@ -78,12 +83,24 @@ function drawMap() {
 		selectable : true,
 	};
 
+	// need to add function to clicking now 
+	// make ajax request corresponding to write functions
+	// api request needs location and sector 
 	map.addListener("clickMapObject", function(event) {
-		//console.log(event.mapObject.enTitle);
-		// load up a little text box with its name 
+		
+		var country = event.mapObject.enTitle;
 		$('#modal-body').empty();
-		$('#modal-body').append(event.mapObject.enTitle);
+		// console.log(event.mapObject);
+		$('#modal-body').append(country);
 		$('#myModal').modal('show');
+
+
+		$('#results').empty();	
+		var result = findImpact(country);
+		$('#results').append("You clicked me!" + result);
+
+
+
 	});
 
 	map.write("mapdiv");
@@ -101,7 +118,7 @@ function processLoan(loans) {
 			loanInformation[loan.lender.lender_id] = [loan.loan];
 		}
 	};
-	// console.log(countries);
+	// console.log(loanInformation);
 }
 
 
@@ -122,6 +139,29 @@ function gatherLocations() {
 			console.log("Error occured" + err);
 		}
 	});
+}
+
+
+// needs country location
+// sends ajax request to fetch country/sector statistics
+// success function needs to return appropriate html code
+function findImpact(country) {
+	var sector = sectorLocations[country];
+	// sector name will be sector[0];
+	var requestOptions = {
+		type : "GET",
+		dataType : "JSON", 
+		data : {
+			location : country
+		},
+		success : function(result) {
+			// return appropriate html code to visualize impact
+		}, 
+		error : function(error) {
+			return "Error occured";
+		}
+	};
+	$.ajax("/api/" + sector, requestOptions);
 }
 
 
