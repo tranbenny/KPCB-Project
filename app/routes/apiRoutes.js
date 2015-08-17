@@ -33,6 +33,9 @@ router.get("/Location", function(req, res) {
 
 router.get('/:sector', function(req, res) {
 	var sector = req.params.sector;
+	if (!(sector in agInfo.apiInfo)) {
+		res.send("Sorry information about this sector has not yet been found");
+	}
 });
 
 // finish the function before returning the response
@@ -43,22 +46,6 @@ router.get('/Agriculture', function(req, res) {
 	});
 });
 
-
-router.get('/Women', function(req, res) {
-
-});
-
-router.get('/Education', function(req, res) {
-
-});
-
-router.get("/Health", function(req, res) {
-
-});
-
-router.get('/Single+Parents', function(req, res) {
-
-});
 
 module.exports = router;
 

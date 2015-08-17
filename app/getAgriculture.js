@@ -53,8 +53,32 @@ var kivaCategories = {
 var defURl = "http://api.worldbank.org/topic/1?per_page=100&format=json";
 
 
-
 var baseURL = "http://api.worldbank.org/countries/";
+
+var endURLS = {
+	// Agriculture : 
+	cropProductionIndex : "/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json",
+	sharedAgriculturalEmployment: "/indicators/ccx_agr_pop_tot?per_page=50&date=1990:2015&format=json", 
+	// Women : 
+	genderEquality : "/indicators/5.51.01.07.gender?per_page=50&date=1990:2015&format=json",
+	averageYearsSchooling : "/indicators/BAR.SCHL.15UP.FE?per_page=50&date=1990:2015&format=json",
+	percentWomen15AboveWithPrimary : "/indicators/BAR.PRM.ICMP.15UP.FE.ZS?per_page=50&date=1990:2015&format=json",
+	sharedEmployeedWomen : "/indicators/ccx_emps_pop_fem?per_page=50&date=1990:2015&format=json"
+	// Education: 
+	youthLiteracyRate : "/indicators/1.1_YOUTH.LITERACY.RATE?per_page=50&date=1990:2015&format=json",
+	primaryCompletion : "/indicators/5.51.01.08.primcomp?per_page=50&date=1990:2015&format=json",
+	hoiSchoolEnrollment : "/indicators/2.0.hoi.Sch?per_page=50&date=1990:2015&format=json",
+	// Health:
+	healthSurvey : "/indicators/5.13.01.01.hlthsurv?per_page=50&date=1990:2015&format=json",
+	nationalImmunizationCoverage : "/indicators/5.13.01.01.who?per_page=50&date=1990:2015&format=json",
+	// Single Parents/Health:
+	childrenMalnutrition : "/indicators/5.51.01.02.malnut?per_page=50&date=1990:2015&format=json",
+	childMortality : "/indicators/5.51.01.03.mortal?per_page=50&date=1990:2015&format=json",
+	maternalHealth : "/indicators/5.51.01.06.matern?per_page=50&date=1990:2015&format=json", 
+
+
+};
+
 var endURL = "/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json";
 
 function findInfo(location, callback) {
