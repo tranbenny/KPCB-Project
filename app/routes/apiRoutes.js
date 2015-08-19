@@ -17,7 +17,7 @@ router.get('/', function(req, res) {
 // needs to send an array of countries
 // response sends back json object with country, latitude and longitude values
 router.get("/Location", function(req, res) {
-	var countries = req.query.countryNames; // object of country names
+	var countries = req.query.countryNames; // object of country code names
 	var allCountries = locInfo.countryData; // array of objects
 	var result = {};
 	allCountries.forEach(function(value, index, array) {
@@ -31,20 +31,31 @@ router.get("/Location", function(req, res) {
 	res.send(result);
 });
 
-router.get('/:sector', function(req, res) {
+router.get('/:countryCode/:sector', function(req, res) {
+	var countryCode = req.params.countryCode;
 	var sector = req.params.sector;
+	console.log("Country: " + countryCode + " Sector: " + sector);
 	if (!(sector in agInfo.apiInfo)) {
-		res.send("Sorry information about this sector has not yet been found");
-	}
+		console.log("Could not find cateogry");
+		res.send({message : "Sorry data about this sector has not yet been found"});
+		return;
+	} else {
+		console.log("Fetching Data now");
+		agInfo.mainFind(countryCode, sector, function(data) {
+			console.log(data);
+			res.send(data);
+		});
+	};
 });
 
+/*
 // finish the function before returning the response
 router.get('/Agriculture', function(req, res) {
 	var location = req.query.location;
 	agInfo.findInfo(location, function(data) {
 		res.send(data); // sends string
 	});
-});
+});*/
 
 
 module.exports = router;
