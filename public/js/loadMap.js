@@ -1,7 +1,10 @@
 // Errors/Conditions to fix: 
 // need to account for if sector is undefined in a country
-// on click events, I want to end all previous pending requests
-// requests are not getting logged?
+
+
+// Features/Functions to add:
+// process JSON information upon clicks
+
 
 
 
@@ -114,9 +117,8 @@ function drawMap() {
 		selectable : true,
 	};
 
-	// need to add function to clicking now 
-	// make ajax request corresponding to write functions
-	// api request needs location and sector 
+	
+	// process json results
 	map.addListener("clickMapObject", function(event) {
 		
 		var country = event.mapObject.enTitle;
@@ -136,7 +138,26 @@ function drawMap() {
 		// set it up so that if there is no data found to load up an alert
 		$('#results').empty();	
 		var result = findImpact(country, function(data) {
-			$('#results').append("Message: " + data.message);
+			// data here is a js object
+			// data.result = array of objects
+			if (Object.keys(data).indexOf("message") != -1) {
+				$('#results').append("Sorry the data for this sector has not yet been loaded");
+			} else {
+
+				var information = data.result; 
+				var countryInformation = {
+					"country" : country,
+					"sector" : sectorLocations[country][0]
+				};
+				$('#results').append(country + "<br />");
+				$('#results').append(countryInformation.sector + "<br />");
+				// make a new function right here
+				processResponse(information, countryInformation);
+			}
+			
+
+
+			// $('#results').append("Message: " + data.message);
 		});
 		// $('#results').append("You clicked me!" + result);
 
@@ -159,7 +180,6 @@ function processLoan(loans) {
 			loanInformation[loan.lender.lender_id] = [loan.loan];
 		}
 	};
-	// console.log(loanInformation);
 }
 
 
@@ -211,7 +231,24 @@ function findImpact(country, callback) {
 	$.ajax("/api/" + countryCode + "/" + sector, requestOptions);
 }
 
-
+function processResponse(information, countryInformation) {
+	information.forEach(function(value, index, array) {
+		// information should contain two arrays of size 2 that contain two different variables
+		var title = value[1][0].indicator.value;
+		countryInformation[title] = [];
+		$('#results').append(title + "<br />");
+		var coreInformation = value[1]; // this is an array of objects
+		coreInformation.forEach(function(v, i, a) {
+			if (v.value != null) {
+				countryInformation[title].push({
+					"date" : v.date,
+					"value" : v.value
+				});
+				$('#results').append(v.date + " : " + v.value + "<br />");
+			}
+		});
+	});
+}
 
 
 
