@@ -42,7 +42,6 @@ router.get('/:countryCode/:sector', function(req, res) {
 	} else {
 		console.log("Fetching Data now");
 		agInfo.mainFind(countryCode, sector, function(data) {
-			console.log(data);
 			res.send(data);
 		});
 	};

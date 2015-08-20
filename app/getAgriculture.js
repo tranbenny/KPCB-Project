@@ -2,6 +2,7 @@
 // configure it all into fields and methods, similar to OOP principles 
 var request = require('request');
 var countryData = require('./countryData');
+// var results = { "result" : [] };
 
 // map relevant data from other API's to information about loan
 var apiInfo= {
@@ -113,26 +114,42 @@ function extractInfo(data) {
 	return(result); // string
 };
 
-
+// figure out a way to send back the data response after multiple requests 
 function mainFind(location, sector, callback) {
 	var endURLs = worldBankEndURLS[sector]; // object with various keys and end urls
+	var sum = Object.keys(endURLs).length;
+	var results = {"result" : []};
+	// for loop needs to contain a method for http requests
 	for (var key in endURLs) {
 		// query builder
 		// need to perform the api request to send back the data
 		var url = baseURL + location + endURLs[key];
 		console.log(url);
-		request(url, function(err, res, body) {
-			if (!err && res.statusCode == 200) {
-				var data = { "result" : JSON.parse(body) };
-				callback(data);
-			}
-		});
-		return; 
+		httpRequests(url, sum, results, callback);
+		/*
+		if (results["result"].length == sum) {
+			console.log("sending the reponse now");
+			callback(results);
+		}*/
 	}
 };
 
+function httpRequests(url, sum, results, callback) {
+	request(url, function(err, res, body) {
+		if (!err && res.statusCode == 200) {
+			var data = JSON.parse(body);
+			console.log("Data: " + data);
+			results["result"].push(data);
+		}
+		console.log(results["result"].length);
+		if (results["result"].length == sum) {
+			console.log("Sending the reponse back now!");
+			callback(results);
+		} 
+	});
+}
 
-
+// the requests are getting the data, but it is not sending the response back. The methods are ending too quickly
 
 
 var apiInfo = {
