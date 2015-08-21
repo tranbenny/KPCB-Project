@@ -1,9 +1,11 @@
 // Errors/Conditions to fix: 
 // need to account for if sector is undefined in a country
+// fix latitude/longitude values for Samoa
 
 
 // Features/Functions to add:
-// process JSON information upon clicks
+// Load up multuple graphs for click events
+// Configure data points to be loaded onto the graphs 
 
 
 
@@ -136,27 +138,25 @@ function drawMap() {
 		abort();
 
 		// set it up so that if there is no data found to load up an alert
-		$('#results').empty();	
+		$('#results').empty();
+		
+
+
 		var result = findImpact(country, function(data) {
 			// data here is a js object
 			// data.result = array of objects
 			if (Object.keys(data).indexOf("message") != -1) {
-				$('#results').append("Sorry the data for this sector has not yet been loaded");
+				$('#results').append('<h3 class="center">Sorry the data for this sector has not yet been loaded</h3>');
 			} else {
-
 				var information = data.result; 
 				var countryInformation = {
 					"country" : country,
 					"sector" : sectorLocations[country][0]
 				};
-				$('#results').append(country + "<br />");
-				$('#results').append(countryInformation.sector + "<br />");
+				$('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
 				// make a new function right here
-				processResponse(information, countryInformation);
+				processResponse(information, countryInformation, country, sector);
 			}
-			
-
-
 			// $('#results').append("Message: " + data.message);
 		});
 		// $('#results').append("You clicked me!" + result);
@@ -231,12 +231,65 @@ function findImpact(country, callback) {
 	$.ajax("/api/" + countryCode + "/" + sector, requestOptions);
 }
 
+
+// svg is the chart here
 function processResponse(information, countryInformation) {
+
+
+
+	// Drawing the chart
+	var WIDTH = 1000;
+	var HEIGHT = 500;
+	var MARGINS = {
+		top : 20,
+		right : 20,
+		bottom : 20, 
+		left : 50
+	};
+	var xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2015]);
+	var yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 1]);
+	var xAxis = d3.svg.axis().scale(xScale);
+	var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+	
+
+	
+	// loading the relevant information, loading information onto the chart
+	// each iteration of this loop should create a new chart
+
+	// Overall title of the charts should be the country and sector
+	// the title value should be on the y axis
+
 	information.forEach(function(value, index, array) {
 		// information should contain two arrays of size 2 that contain two different variables
-		var title = value[1][0].indicator.value;
+
+		// sometimes title values are null
+		try {
+			var title = value[1][0].indicator.value; // y-value
+		} 
+		catch(err) {
+			var title = "undefined";
+		}
+		var chartId = "chart" + index;
+		$('#results').append('<div><svg id="' + chartId + '"></svg>');
 		countryInformation[title] = [];
-		$('#results').append(title + "<br />");
+
+		// draw chart here
+
+		var svg = d3.select('#' + chartId).attr("width", WIDTH).attr("height", HEIGHT);
+		svg.append("svg:g").attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")").call(xAxis);
+		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)").call(yAxis);
+		
+		
+		svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", WIDTH)
+			.attr("y", HEIGHT - 2).text("Year");
+		
+		svg.append("text").attr("class", "y label").attr("text-anchor", "end").attr("y", 6)
+			.attr("dy", ".75em").attr("transform", "rotate(-90)").text(title); 
+
+
+
+		// processes data points
 		var coreInformation = value[1]; // this is an array of objects
 		coreInformation.forEach(function(v, i, a) {
 			if (v.value != null) {
@@ -244,10 +297,18 @@ function processResponse(information, countryInformation) {
 					"date" : v.date,
 					"value" : v.value
 				});
-				$('#results').append(v.date + " : " + v.value + "<br />");
+				// $('#results').append(v.date + " : " + v.value + "<br />");
 			}
 		});
+		$('#results').append("</div>");
+
+
+
 	});
+	
+
+
+	
 }
 
 
