@@ -1,11 +1,14 @@
 // Errors/Conditions to fix: 
 // need to account for if sector is undefined in a country
 // fix latitude/longitude values for Samoa
+// need to fix null value iterations
 
 
 // Features/Functions to add:
-// Load up multuple graphs for click events
-// Configure data points to be loaded onto the graphs 
+// Need to fix axis label spacing
+// take out comma in xAxis label
+// add transitions to how graphs are loaded 
+
 
 
 
@@ -246,10 +249,7 @@ function processResponse(information, countryInformation) {
 		bottom : 20, 
 		left : 50
 	};
-	var xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2015]);
-	var yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 1]);
-	var xAxis = d3.svg.axis().scale(xScale);
-	var yAxis = d3.svg.axis().scale(yScale).orient("left");
+	
 
 	
 
@@ -274,32 +274,71 @@ function processResponse(information, countryInformation) {
 		$('#results').append('<div><svg id="' + chartId + '"></svg>');
 		countryInformation[title] = [];
 
-		// draw chart here
-
-		var svg = d3.select('#' + chartId).attr("width", WIDTH).attr("height", HEIGHT);
-		svg.append("svg:g").attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")").call(xAxis);
-		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)").call(yAxis);
-		
-		
-		svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", WIDTH)
-			.attr("y", HEIGHT - 2).text("Year");
-		
-		svg.append("text").attr("class", "y label").attr("text-anchor", "end").attr("y", 6)
-			.attr("dy", ".75em").attr("transform", "rotate(-90)").text(title); 
-
-
-
 		// processes data points
+		// need to find max and min values for x and y axis
+	
 		var coreInformation = value[1]; // this is an array of objects
+		
+		var yMin = 0;
+		var yMax = 0;
 		coreInformation.forEach(function(v, i, a) {
 			if (v.value != null) {
-				countryInformation[title].push({
+				countryInformation[title].push(
+					/*{
 					"date" : v.date,
 					"value" : v.value
-				});
-				// $('#results').append(v.date + " : " + v.value + "<br />");
+				}*/
+				[Number(v.date), Number(v.value)]);
+
+				if (Number(v.value) < yMin) {
+					yMin = Number(v.value);
+				} else if (Number(v.value) > yMax) {
+					yMax = Number(v.value);
+				}
 			}
 		});
+
+		console.log("Min: " + yMin + ", Max: " + yMax);
+
+		
+		var xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2015]);
+		var yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([yMin, yMax]);
+		/*
+		var xScale = d3.scale.linear().domain([2000, 2015]).range([0, WIDTH]);
+		var yScale = d3.scale.linear().domain([yMin, yMax]).range([0, HEIGHT]);
+		*/
+		var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(15);
+		var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(15);
+
+		// draw chart here
+		var svg = d3.select('#' + chartId).attr("width", WIDTH).attr("height", HEIGHT);
+
+		
+
+		svg.selectAll("circle")
+			.data(countryInformation[title]).enter()
+				.append("circle")
+				.attr("cx", function(d) {
+					return xScale(d[0]);
+				})
+				.attr("cy", function(d) {
+					return yScale(d[1]);
+				})
+				.attr("r", 5);
+		
+
+		
+ 
+
+
+		svg.append("svg:g").attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+			.attr("class", "axis").call(xAxis);
+		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)")
+			.attr("class", "axis").call(yAxis);
+		svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", WIDTH)
+			.attr("y", HEIGHT - 2).text("Year");
+		svg.append("text").attr("class", "y label").attr("text-anchor", "end").attr("y", 6)
+			.attr("dy", ".75em").attr("transform", "rotate(-90)").text(title); 
 		$('#results').append("</div>");
 
 
