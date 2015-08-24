@@ -5,13 +5,11 @@
 
 
 // Features/Functions to add:
-// fit graph groups into bootstrap groups
 
 // figure out how to deal with undefined values
-// add transitions to how graphs are loaded 
+
 
 // add more things to be loaded for each sector
-// re-size the graphs 
 // How do I want to load unknown values?
 
 // Customize navigation bar 
@@ -177,7 +175,8 @@ function drawMap() {
 
 
 	});
-
+	
+	$('#load').hide();
 	map.write("mapdiv");
 };
 
@@ -338,6 +337,18 @@ function processResponse(information, countryInformation) {
 					return yScale(d[1]);
 				})
 				.attr("r", 5);
+
+		
+		var valueLine = d3.svg.line()
+			.defined(function(d) {
+				return !isNaN(d[1]);
+			})
+			.x(function(d) {
+				return xScale(d[0]);
+			})
+			.y(function(d) {
+				return yScale(d[1]);
+			}); 
 		
 
 		
@@ -360,6 +371,11 @@ function processResponse(information, countryInformation) {
 			.attr("dy", "0.75em")
 			.attr("transform", "rotate(-90)")
 			.text(title); 
+		
+		svg.append("path")
+			.attr("id", "line")
+			.attr("d", valueLine(countryInformation[title]));
+				 
 		$('#results').append("</div>");
 
 	});
@@ -368,6 +384,8 @@ function processResponse(information, countryInformation) {
 
 	
 }
+
+
 
 
 
