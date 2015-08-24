@@ -1,9 +1,22 @@
 // Errors/Conditions to fix: 
 // need to account for if sector is undefined in a country
+// fix latitude/longitude values for Samoa
+// need to fix null value iterations
 
 
 // Features/Functions to add:
-// process JSON information upon clicks
+
+// figure out how to deal with undefined values
+
+
+// add more things to be loaded for each sector
+// How do I want to load unknown values?
+
+// Customize navigation bar 
+// Create the theme to match website
+// load user profiles instead of all the loans
+// clean up code
+
 
 
 
@@ -136,27 +149,25 @@ function drawMap() {
 		abort();
 
 		// set it up so that if there is no data found to load up an alert
-		$('#results').empty();	
+		$('#results').empty();
+		
+
+
 		var result = findImpact(country, function(data) {
 			// data here is a js object
 			// data.result = array of objects
 			if (Object.keys(data).indexOf("message") != -1) {
-				$('#results').append("Sorry the data for this sector has not yet been loaded");
+				$('#results').append('<h3 class="center">Sorry the data for this sector has not yet been loaded</h3>');
 			} else {
-
 				var information = data.result; 
 				var countryInformation = {
 					"country" : country,
 					"sector" : sectorLocations[country][0]
 				};
-				$('#results').append(country + "<br />");
-				$('#results').append(countryInformation.sector + "<br />");
+				$('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
 				// make a new function right here
-				processResponse(information, countryInformation);
+				processResponse(information, countryInformation, country, sector);
 			}
-			
-
-
 			// $('#results').append("Message: " + data.message);
 		});
 		// $('#results').append("You clicked me!" + result);
@@ -164,7 +175,8 @@ function drawMap() {
 
 
 	});
-
+	
+	$('#load').hide();
 	map.write("mapdiv");
 };
 
@@ -231,27 +243,147 @@ function findImpact(country, callback) {
 	$.ajax("/api/" + countryCode + "/" + sector, requestOptions);
 }
 
+
+// svg is the chart here
 function processResponse(information, countryInformation) {
+
+
+
+	// Drawing the chart
+	var WIDTH = 800;
+	var HEIGHT = 500;
+	var MARGINS = {
+		top : 40,
+		right : 40,
+		bottom : 40, 
+		left : 70
+	};
+	
+
+	
+
+	
+	// loading the relevant information, loading information onto the chart
+	// each iteration of this loop should create a new chart
+
+	// Overall title of the charts should be the country and sector
+	// the title value should be on the y axis
+
 	information.forEach(function(value, index, array) {
 		// information should contain two arrays of size 2 that contain two different variables
-		var title = value[1][0].indicator.value;
+
+		// sometimes title values are null
+		try {
+			var title = value[1][0].indicator.value; // y-value
+		} 
+		catch(err) {
+			var title = "undefined";
+		}
+		var chartId = "chart" + index;
+		$('#results').append('<div class="row"><svg id="' + chartId + '"></svg>');
 		countryInformation[title] = [];
-		$('#results').append(title + "<br />");
+
+		// processes data points
+		// need to find max and min values for x and y axis
+	
 		var coreInformation = value[1]; // this is an array of objects
+		
+		var yMin = 0;
+		var yMax = 0;
 		coreInformation.forEach(function(v, i, a) {
 			if (v.value != null) {
-				countryInformation[title].push({
+				countryInformation[title].push(
+					/*{
 					"date" : v.date,
 					"value" : v.value
-				});
-				$('#results').append(v.date + " : " + v.value + "<br />");
+				}*/
+				[Number(v.date), Number(v.value)]);
+
+				if (Number(v.value) < yMin) {
+					yMin = Number(v.value);
+				} else if (Number(v.value) > yMax) {
+					yMax = Number(v.value);
+				}
 			}
 		});
+
+		console.log("Min: " + yMin + ", Max: " + yMax);
+
+		
+		var xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2015]);
+		var yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([yMin, yMax]);
+		/*
+		var xScale = d3.scale.linear().domain([2000, 2015]).range([0, WIDTH]);
+		var yScale = d3.scale.linear().domain([yMin, yMax]).range([0, HEIGHT]);
+		*/
+		var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(15)
+			.tickFormat(function(d) {
+				return d;
+			});
+		var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(15);
+
+		// draw chart here
+		var svg = d3.select('#' + chartId).attr("width", WIDTH).attr("height", HEIGHT);
+
+		
+
+		svg.selectAll("circle")
+			.data(countryInformation[title]).enter()
+				.append("circle")
+				.attr("cx", function(d) {
+					return xScale(d[0]);
+				})
+				.attr("cy", function(d) {
+					return yScale(d[1]);
+				})
+				.attr("r", 5);
+
+		
+		var valueLine = d3.svg.line()
+			.defined(function(d) {
+				return !isNaN(d[1]);
+			})
+			.x(function(d) {
+				return xScale(d[0]);
+			})
+			.y(function(d) {
+				return yScale(d[1]);
+			}); 
+		
+
+		
+ 
+
+
+		svg.append("svg:g").attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+			.attr("class", "axis").call(xAxis);
+		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)")
+			.attr("class", "axis").call(yAxis);
+		svg.append("text").attr("class", "x-label")
+			.attr("text-anchor", "end")
+			.attr("x", WIDTH - 30)
+			.attr("y", HEIGHT - 50)
+			.text("Year");
+		svg.append("text").attr("class", "y-label")
+			.attr("text-anchor", "middle")
+			.attr("y", 0)
+			.attr("x", 0 - (HEIGHT / 2))
+			.attr("dy", "0.75em")
+			.attr("transform", "rotate(-90)")
+			.text(title); 
+		
+		svg.append("path")
+			.attr("id", "line")
+			.attr("d", valueLine(countryInformation[title]));
+				 
+		$('#results').append("</div>");
+
 	});
+	
+
+
+	
 }
-
-
-
 
 
 
