@@ -5,9 +5,19 @@
 
 
 // Features/Functions to add:
-// Need to fix axis label spacing
-// take out comma in xAxis label
+// fit graph groups into bootstrap groups
+
+// figure out how to deal with undefined values
 // add transitions to how graphs are loaded 
+
+// add more things to be loaded for each sector
+// re-size the graphs 
+// How do I want to load unknown values?
+
+// Customize navigation bar 
+// Create the theme to match website
+// load user profiles instead of all the loans
+// clean up code
 
 
 
@@ -241,13 +251,13 @@ function processResponse(information, countryInformation) {
 
 
 	// Drawing the chart
-	var WIDTH = 1000;
+	var WIDTH = 800;
 	var HEIGHT = 500;
 	var MARGINS = {
-		top : 20,
-		right : 20,
-		bottom : 20, 
-		left : 50
+		top : 40,
+		right : 40,
+		bottom : 40, 
+		left : 70
 	};
 	
 
@@ -271,7 +281,7 @@ function processResponse(information, countryInformation) {
 			var title = "undefined";
 		}
 		var chartId = "chart" + index;
-		$('#results').append('<div><svg id="' + chartId + '"></svg>');
+		$('#results').append('<div class="row"><svg id="' + chartId + '"></svg>');
 		countryInformation[title] = [];
 
 		// processes data points
@@ -307,7 +317,10 @@ function processResponse(information, countryInformation) {
 		var xScale = d3.scale.linear().domain([2000, 2015]).range([0, WIDTH]);
 		var yScale = d3.scale.linear().domain([yMin, yMax]).range([0, HEIGHT]);
 		*/
-		var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(15);
+		var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(15)
+			.tickFormat(function(d) {
+				return d;
+			});
 		var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(15);
 
 		// draw chart here
@@ -335,13 +348,19 @@ function processResponse(information, countryInformation) {
 			.attr("class", "axis").call(xAxis);
 		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)")
 			.attr("class", "axis").call(yAxis);
-		svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", WIDTH)
-			.attr("y", HEIGHT - 2).text("Year");
-		svg.append("text").attr("class", "y label").attr("text-anchor", "end").attr("y", 6)
-			.attr("dy", ".75em").attr("transform", "rotate(-90)").text(title); 
+		svg.append("text").attr("class", "x-label")
+			.attr("text-anchor", "end")
+			.attr("x", WIDTH - 30)
+			.attr("y", HEIGHT - 50)
+			.text("Year");
+		svg.append("text").attr("class", "y-label")
+			.attr("text-anchor", "middle")
+			.attr("y", 0)
+			.attr("x", 0 - (HEIGHT / 2))
+			.attr("dy", "0.75em")
+			.attr("transform", "rotate(-90)")
+			.text(title); 
 		$('#results').append("</div>");
-
-
 
 	});
 	
@@ -349,11 +368,6 @@ function processResponse(information, countryInformation) {
 
 	
 }
-
-
-
-
-
 
 
 

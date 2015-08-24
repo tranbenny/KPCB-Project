@@ -17,6 +17,13 @@ body {
 	shape-rendering : crispEdges;
 }
 
+.x-label, .y-label {
+	font-weight : bold;
+}
+
+#resultTitle {
+	text-decoration : underline;
+}
 
 
 
