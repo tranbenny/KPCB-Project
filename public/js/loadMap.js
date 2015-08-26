@@ -7,6 +7,7 @@
 // Features/Functions to add:
 
 // figure out how to deal with undefined values
+// need to add more world bank information
 
 
 // add more things to be loaded for each sector
@@ -55,6 +56,7 @@ var countryLocations = {}; // Key : countries, value : longitude/latitude values
 var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
 var sectorLocations = {}; // Key : country, value : array of sectors
 var countryCodes = {};
+var images = {};
 
 
 function findAllInformation(callback) {
@@ -66,6 +68,7 @@ function findAllInformation(callback) {
 			console.log("Found information!");
 			var loans = result.lending_actions;
 			processLoan(loans); */
+			console.log(result);
 			var loans = result.lending_actions;
 			processLoan(loans);
 			callback();
@@ -135,6 +138,7 @@ function drawMap() {
 	map.addListener("clickMapObject", function(event) {
 		
 		var country = event.mapObject.enTitle;
+		var image = images[country][0]; // this is an id value
 		var sectors = sectorLocations[country];
 		$('#modal-body').empty();
 		// console.log(event.mapObject);
@@ -143,6 +147,7 @@ function drawMap() {
 		sectors.forEach(function(value, index, array) {
 			$('#modal-body').append(" " + value);
 		});
+		$('#myModal').append("<img src='http://www.kiva.org/img/s300/" + image + ".jpg'>");
 		$('#myModal').modal('show');
 
 		// end any previous requests
@@ -181,9 +186,17 @@ function drawMap() {
 };
 
 
+
+// saves image data and saves loan information data
 function processLoan(loans) {
 	for (var i = 0; i < 20; i++) {
 		var loan = loans[i];
+		var loanImageID = loan.loan.image.id;
+		if (loan.loan.location.country in images) {
+			images[loan.loan.location.country].push(loanImageID);
+		} else {
+			images[loan.loan.location.country] = [loanImageID];
+		}
 		var country = loan.loan.location.country_code;
 		countries.push(country);
 		if (loan.lender.lender_id in loanInformation) {

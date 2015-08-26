@@ -1,3 +1,8 @@
+// sectors to add:
+// Education, Services, Food, Manufacturing, Clothing, Transportation, Arts
+// Retail, Construction 
+
+
 // configure all the methods to get all the relevant agricultural information
 // configure it all into fields and methods, similar to OOP principles 
 var request = require('request');
@@ -46,6 +51,14 @@ var kivaCategories = {
 		"World Bank" : ["Aid Effectiveness"] // Maternal mortality rate, teenage mothers
 		// pregnant women receiving prenatal care 
 	}, 
+	"Services" : {},
+	"Food" : {},
+	"Manufacturing" : {},
+	"Clothing" : {},
+	"Retail" : {},
+	"Construction" : {},
+	"Transportation" : {}
+
 	// "Shelter" : {},
 	// "Retail Businesses" : {},
 	// "Food" : {}
@@ -61,7 +74,8 @@ var worldBankEndURLS = {
 	// Agriculture :
 	"Agriculture" : { 
 		cropProductionIndex : "/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json",
-		sharedAgriculturalEmployment: "/indicators/ccx_agr_pop_tot?per_page=50&date=1990:2015&format=json"
+		sharedAgriculturalEmployment: "/indicators/ccx_agr_pop_tot?per_page=50&date=1990:2015&format=json",
+		percentAgriculturalLand : "/indicators/AG.LND.AGRI.ZS?per_page=50&date=2000:2015&format=json",
 	},
 	"Women" : {
 	// Women : 
@@ -74,18 +88,58 @@ var worldBankEndURLS = {
 	// Education: 
 		youthLiteracyRate : "/indicators/1.1_YOUTH.LITERACY.RATE?per_page=50&date=1990:2015&format=json",
 		primaryCompletion : "/indicators/5.51.01.08.primcomp?per_page=50&date=1990:2015&format=json",
-		hoiSchoolEnrollment : "/indicators/2.0.hoi.Sch?per_page=50&date=1990:2015&format=json"
+		hoiSchoolEnrollment : "/indicators/2.0.hoi.Sch?per_page=50&date=1990:2015&format=json",
+		shareOfInactiveStudents : "/indicators/ccx_inact_pop_tot?per_page=50&date=2000:2015&format=json",
 	},
 	"Health" : {
 	// Health:
 		healthSurvey : "/indicators/5.13.01.01.hlthsurv?per_page=50&date=1990:2015&format=json",
-		nationalImmunizationCoverage : "/indicators/5.13.01.01.who?per_page=50&date=1990:2015&format=json"
+		nationalImmunizationCoverage : "/indicators/5.13.01.01.who?per_page=50&date=1990:2015&format=json", 
+		childrenMalnutrition : "/indicators/5.51.01.02.malnut?per_page=50&date=1990:2015&format=json",
+		immunization : "/indicators/5.51.01.04.immun?per_page=50&date=2000:2015&format=json"
 	},
 	"Single Parents" : {
 	// Single Parents/Health:
 		childrenMalnutrition : "/indicators/5.51.01.02.malnut?per_page=50&date=1990:2015&format=json",
 		childMortality : "/indicators/5.51.01.03.mortal?per_page=50&date=1990:2015&format=json",
 		maternalHealth : "/indicators/5.51.01.06.matern?per_page=50&date=1990:2015&format=json"
+	}, 
+	"Services" : {
+		serviceImports : "/indicators/BM.GSR.NFSV.CD?per_page=50&date=2000:2015&format=json",
+		serviceExports : "/indicators/BX.GSR.NFSV.CD?per_page=50&date=2000:2015&format=json",
+		shareEmployed : "/indicators/ccx_empl_pop_tot?per_page=50&date=2000:2015&format=json",
+		laborForce : "/indicators/ccx_lf_pop_tot?per_page=50&date=2000:2015&format=json",
+		serviceEmployed : "/indicators/ccx_serv_pop_tot?per_page=50&date=2000:2015&format=json",
+		unemploymentRate : "/indicators/ccx_unempr_pop_tot?per_page=50&date=2000:2015&format=json"
+	}, 
+	"Food" : {
+		foodProductionIndex : "/indicators/AG.PRD.FOOD.XD?per_page=50&date=2000:2015&format=json",
+	}, 
+	"Manufacturing" : {
+		shareEmployed : "/indicators/ccx_empl_pop_tot?per_page=50&date=2000:2015&format=json",
+		laborForce : "/indicators/ccx_lf_pop_tot?per_page=50&date=2000:2015&format=json",
+		shareUnemployed : "/indicators/ccx_unempl_pop_tot?per_page=50&date=2000:2015&format=json",
+		unemploymentRate  : "/indicators/ccx_unempr_pop_tot?per_page=50&date=2000:2015&format=json"
+	}, 
+	"Clothing" : {
+		shareEmployed : "/indicators/ccx_empl_pop_tot?per_page=50&date=2000:2015&format=json",
+		shareUnemployed : "/indicators/ccx_unempl_pop_tot?per_page=50&date=2000:2015&format=json"
+	}, 
+	"Retail" : {
+		shareEmployed : "/indicators/ccx_empl_pop_tot?per_page=50&date=2000:2015&format=json",
+		shareUnemployed : "/indicators/ccx_unempl_pop_tot?per_page=50&date=2000:2015&format=json",
+		unemploymentRate : "/indicators/ccx_unempr_pop_tot?per_page=50&date=2000:2015&format=json"
+	}, 
+	"Construction" : {
+		shareEmployed : "/indicators/ccx_empl_pop_tot?per_page=50&date=2000:2015&format=json",
+		laborForce : "/indicators/ccx_lf_pop_tot?per_page=50&date=2000:2015&format=json",
+		shareUnemployed : "/indicators/ccx_unempl_pop_tot?per_page=50&date=2000:2015&format=json",
+		unemploymentRate : "/indicators/ccx_unempr_pop_tot?per_page=50&date=2000:2015&format=json"
+	}, 
+	"Transportation" : {
+		transportServices : "/indicators/BM.GSR.TRAN.ZS?per_page=50&date=2000:2015&format=json",
+		laborForce : "/indicators/ccx_lf_pop_tot?per_page=50&date=2000:2015&format=json", 
+		unemploymentRate : "/indicators/ccx_unempr_pop_tot?per_page=50&date=2000:2015&format=json"
 	}
 };
 
