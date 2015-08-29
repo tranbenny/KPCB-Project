@@ -2,6 +2,8 @@
 // Education, Services, Food, Manufacturing, Clothing, Transportation, Arts
 // Retail, Construction 
 
+// need to add housing
+
 
 // configure all the methods to get all the relevant agricultural information
 // configure it all into fields and methods, similar to OOP principles 
@@ -180,11 +182,6 @@ function mainFind(location, sector, callback) {
 		var url = baseURL + location + endURLs[key];
 		console.log(url);
 		httpRequests(url, sum, results, callback);
-		/*
-		if (results["result"].length == sum) {
-			console.log("sending the reponse now");
-			callback(results);
-		}*/
 	}
 };
 

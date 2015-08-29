@@ -20,7 +20,8 @@
 
 
 
-
+//////////////////////////////////////////
+// handle ajax requests
 
 
 // handling multiple ajax requests that pend for too long
@@ -31,7 +32,6 @@ var xhrPool = [];
 $(document).ajaxSend(function(event, jqXHR, options) {
 	xhrPool.push(jqXHR);
 });
-
 
 // after each ajax request, filters out the requests that are not XML HTTP Requests
 $(document).ajaxComplete(function(e, jqXHR, options) {
@@ -46,35 +46,29 @@ function abort() {
 	});
 }
 
+///////////////////////////////////////////
+// draw map on load
 
 
-
-var loanInformation = {}; // Key: UserID, Value:Array of loans
+var loanInformation = {}; // Key: UserID, Value: Array of loans
 var countries = []; // array of all countries
 var countryLocations = {}; // Key : countries, value : longitude/latitude values 
 // returns most recent loans made 
 var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
-var sectorLocations = {}; // Key : country, value : array of sectors
+// Key : country, value : Array of objects, the objects need to include the sector, loan information, user ID 
+var sectorLocations = {}; 
 var countryCodes = {};
-var images = {};
 
+findAllInformation(gatherLocations);
 
 function findAllInformation(callback) {
 	var loadLoanOptions = {
 		type : "GET", 
 		dataType : "json", 
 		success : function(result) {
-			/*
-			console.log("Found information!");
-			var loans = result.lending_actions;
-			processLoan(loans); */
-			console.log(result);
 			var loans = result.lending_actions;
 			processLoan(loans);
 			callback();
-			// process only the first 20 loaning actions
-			
-			// loanInformation = object where key is lenderID and value is array of all loans
 		},
 		error : function(err) {
 			console.log("Error occured" + err);
@@ -83,8 +77,6 @@ function findAllInformation(callback) {
 	};
 	$.ajax(recentLoansURL, loadLoanOptions);
 };
-
-findAllInformation(gatherLocations);
 
 
 function drawMap() {
@@ -99,9 +91,8 @@ function drawMap() {
 	};
 
 	// adds all the location values to draw circles
-	// map location and sector values <--
 	for (var userID in loanInformation) {
-		var loans = loanInformation[userID]; 
+		var loans = loanInformation[userID]; // an array of object loans
 		loans.forEach(function(value, index, array) {
 			var country = value.location.country_code;
 			if (!(value.location.country in countryCodes)) {
@@ -116,10 +107,15 @@ function drawMap() {
 				longitude : lon
 			}; 
 			dataProvider.images.push(image);
+			// key = country name
+			// value = object with sectors, loans, images
+			var sectorKey = value.sector;
+			var imageLoanSector = {};
+			imageLoanSector[sectorKey] = value;
 			if (value.location.country in sectorLocations) {
-				sectorLocations[value.location.country].push(value.sector);
+				sectorLocations[value.location.country].push(imageLoanSector);
 			} else {
-				sectorLocations[value.location.country] = [value.sector];
+				sectorLocations[value.location.country] = [imageLoanSector];
 			}
 		});
 	}
@@ -133,13 +129,21 @@ function drawMap() {
 		selectable : true,
 	};
 
-	
-	// process json results
+	// when i click i also want to add the image 
+	// when i hover over a country, display user and sector
+	// given the country, find the correct image 
 	map.addListener("clickMapObject", function(event) {
-		
+		abort(); // ends previous ajax requests
+		$('#results').empty(); 
 		var country = event.mapObject.enTitle;
-		var image = images[country][0]; // this is an id value
-		var sectors = sectorLocations[country];
+		var sectors = [];
+		// this is an array of objects
+		sectorLocations[country].forEach(function(value, index, array) {
+			sectors.push(Object.keys(value)[0]); // FIX THIS
+		});
+		
+		// loads a modal
+		/*
 		$('#modal-body').empty();
 		// console.log(event.mapObject);
 		$('#modal-body').append(country + " ");
@@ -147,56 +151,35 @@ function drawMap() {
 		sectors.forEach(function(value, index, array) {
 			$('#modal-body').append(" " + value);
 		});
-		$('#myModal').append("<img src='http://www.kiva.org/img/s300/" + image + ".jpg'>");
+		// $('#modal-body').append("<img src='http://www.kiva.org/img/s300/" + image + ".jpg'>");
 		$('#myModal').modal('show');
-
-		// end any previous requests
-		abort();
-
-		// set it up so that if there is no data found to load up an alert
-		$('#results').empty();
 		
-
-
+		*/
 		var result = findImpact(country, function(data) {
-			// data here is a js object
-			// data.result = array of objects
 			if (Object.keys(data).indexOf("message") != -1) {
 				$('#results').append('<h3 class="center">Sorry the data for this sector has not yet been loaded</h3>');
 			} else {
 				var information = data.result; 
 				var countryInformation = {
 					"country" : country,
-					"sector" : sectorLocations[country][0]
+					"sector" : Object.keys(sectorLocations[country][0])[0] 
 				};
 				$('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
-				// make a new function right here
-				processResponse(information, countryInformation, country, sector);
+				processResponse(information, countryInformation);
 			}
-			// $('#results').append("Message: " + data.message);
 		});
-		// $('#results').append("You clicked me!" + result);
-
-
-
 	});
-	
 	$('#load').hide();
 	map.write("mapdiv");
 };
 
-
+/////////////////////////////////////////////////////////////////////////////
+// click functions 
 
 // saves image data and saves loan information data
 function processLoan(loans) {
 	for (var i = 0; i < 20; i++) {
 		var loan = loans[i];
-		var loanImageID = loan.loan.image.id;
-		if (loan.loan.location.country in images) {
-			images[loan.loan.location.country].push(loanImageID);
-		} else {
-			images[loan.loan.location.country] = [loanImageID];
-		}
 		var country = loan.loan.location.country_code;
 		countries.push(country);
 		if (loan.lender.lender_id in loanInformation) {
@@ -207,9 +190,7 @@ function processLoan(loans) {
 	};
 }
 
-
-
-
+// finds all the latitude/longitude values for countries
 function gatherLocations() {
 	$.ajax("/api/Location", {
 		type : "GET",
@@ -232,8 +213,9 @@ function gatherLocations() {
 // sends ajax request to fetch country/sector statistics
 // success function needs to return appropriate html code
 function findImpact(country, callback) {
-	var sectors = sectorLocations[country];// this is an array
-	var sector = sectors[0];
+	// FIX THIS
+	var sectors = sectorLocations[country]; // this is an array of objects
+	var sector = Object.keys(sectors[0])[0];
 	var countryCode = countryCodes[country];
 	// sector name will be sector[0];
 	var requestOptions = {
@@ -243,24 +225,27 @@ function findImpact(country, callback) {
 			location : country
 		},
 		success : function(result) {
-			// return appropriate html code to visualize impact
-			// if statement to check if the message is data or not
-			console.log(result);
-			//
 			callback(result);
 		}, 
 		error : function(error) {
-			return "Error occured";
+			return "Error occured " + error;
 		}
 	};
 	$.ajax("/api/" + countryCode + "/" + sector, requestOptions);
 }
 
 
-// svg is the chart here
+// function draws the chart 
 function processResponse(information, countryInformation) {
-
-
+	// countryInformation.sector
+	var image;
+	sectorLocations[countryInformation.country].forEach(function(value, index, array) {
+		if (Object.keys(value)[0] == countryInformation.sector) {
+			image = value[countryInformation.sector].image.id;
+		}
+	}); // array of objects
+	// <img src='http://www.kiva.org/img/s300/" + image + ".jpg'>"
+	$('#results').append("<div class='row'> <img src='http://www.kiva.org/img/s300/" + image + ".jpg'> </div>");
 
 	// Drawing the chart
 	var WIDTH = 800;
@@ -271,33 +256,18 @@ function processResponse(information, countryInformation) {
 		bottom : 40, 
 		left : 70
 	};
-	
-
-	
-
-	
-	// loading the relevant information, loading information onto the chart
-	// each iteration of this loop should create a new chart
-
-	// Overall title of the charts should be the country and sector
-	// the title value should be on the y axis
 
 	information.forEach(function(value, index, array) {
 		// information should contain two arrays of size 2 that contain two different variables
-
 		// sometimes title values are null
 		try {
 			var title = value[1][0].indicator.value; // y-value
-		} 
-		catch(err) {
+		} catch(err) {
 			var title = "undefined";
 		}
 		var chartId = "chart" + index;
 		$('#results').append('<div class="row"><svg id="' + chartId + '"></svg>');
 		countryInformation[title] = [];
-
-		// processes data points
-		// need to find max and min values for x and y axis
 	
 		var coreInformation = value[1]; // this is an array of objects
 		
@@ -306,12 +276,7 @@ function processResponse(information, countryInformation) {
 		coreInformation.forEach(function(v, i, a) {
 			if (v.value != null) {
 				countryInformation[title].push(
-					/*{
-					"date" : v.date,
-					"value" : v.value
-				}*/
 				[Number(v.date), Number(v.value)]);
-
 				if (Number(v.value) < yMin) {
 					yMin = Number(v.value);
 				} else if (Number(v.value) > yMax) {
@@ -321,25 +286,17 @@ function processResponse(information, countryInformation) {
 		});
 
 		console.log("Min: " + yMin + ", Max: " + yMax);
-
-		
+	
 		var xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000, 2015]);
 		var yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([yMin, yMax]);
-		/*
-		var xScale = d3.scale.linear().domain([2000, 2015]).range([0, WIDTH]);
-		var yScale = d3.scale.linear().domain([yMin, yMax]).range([0, HEIGHT]);
-		*/
 		var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(15)
 			.tickFormat(function(d) {
 				return d;
 			});
 		var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(15);
 
-		// draw chart here
+	
 		var svg = d3.select('#' + chartId).attr("width", WIDTH).attr("height", HEIGHT);
-
-		
-
 		svg.selectAll("circle")
 			.data(countryInformation[title]).enter()
 				.append("circle")
@@ -351,7 +308,6 @@ function processResponse(information, countryInformation) {
 				})
 				.attr("r", 5);
 
-		
 		var valueLine = d3.svg.line()
 			.defined(function(d) {
 				return !isNaN(d[1]);
@@ -363,11 +319,6 @@ function processResponse(information, countryInformation) {
 				return yScale(d[1]);
 			}); 
 		
-
-		
- 
-
-
 		svg.append("svg:g").attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
 			.attr("class", "axis").call(xAxis);
 		svg.append("svg:g").attr("transform", "translate(" + (MARGINS.left) + ",0)")
@@ -390,12 +341,7 @@ function processResponse(information, countryInformation) {
 			.attr("d", valueLine(countryInformation[title]));
 				 
 		$('#results').append("</div>");
-
 	});
-	
-
-
-	
 }
 
 
