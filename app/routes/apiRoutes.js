@@ -13,6 +13,13 @@ router.get('/', function(req, res) {
 	res.send('Hello World, this is a different page');
 });
 
+router.get('/recentLoans', function(req, res) {
+	var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
+	agInfo.getRecentLoans(recentLoansURL, function(data) {
+		res.send(data);
+	});
+});
+
 
 // needs to send an array of countries
 // response sends back json object with country, latitude and longitude values

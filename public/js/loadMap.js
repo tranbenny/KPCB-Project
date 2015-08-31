@@ -66,7 +66,7 @@ function findAllInformation(callback) {
 		type : "GET", 
 		dataType : "json", 
 		success : function(result) {
-			var loans = result.lending_actions;
+			var loans = result.result.lending_actions;
 			processLoan(loans);
 			callback();
 		},
@@ -75,7 +75,7 @@ function findAllInformation(callback) {
 			$('#mapdiv').append("Error Retrieving Data");
 		}
 	};
-	$.ajax(recentLoansURL, loadLoanOptions);
+	$.ajax("/api/recentLoans", loadLoanOptions);
 };
 
 

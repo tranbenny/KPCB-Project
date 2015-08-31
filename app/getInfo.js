@@ -215,6 +215,18 @@ function userFind(username, callback) {
 	});
 };
 
+function getRecentLoans(url, callback) {
+	request(url, function(err, res, body) {
+		if (!err && res.statusCode == 200) {
+			var data = JSON.parse(body);
+			var result = { "result" : data };
+			callback(result);
+		} else {
+			var result = {"result" : "Error retrieving data"};
+			callback(result);
+		}
+	});
+}
 
 // the requests are getting the data, but it is not sending the response back. The methods are ending too quickly
 
@@ -223,7 +235,8 @@ var apiInfo = {
 	apiInfo : kivaCategories,
 	findInfo : findInfo,
 	mainFind : mainFind,
-	userFind : userFind
+	userFind : userFind,
+	getRecentLoans : getRecentLoans
 };
 
 
