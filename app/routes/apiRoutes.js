@@ -3,7 +3,7 @@
 var express = require('express');
 var router = express.Router();
 var locInfo = require("../countryData"); 
-var agInfo = require("../getAgriculture");
+var agInfo = require("../getInfo");
 
 // agInfo.apiInfo = kiva categories 
 // agInfo.findInfo(location, callback) : finds the appropriate information
@@ -31,7 +31,17 @@ router.get("/Location", function(req, res) {
 	res.send(result);
 });
 
+router.get('/lendor/:username', function(req, res) {
+	console.log("finding username");
+	var username = req.params.username;
+	// fetch loans 
+	agInfo.userFind(username, function(data) {
+		res.send(data);
+	});
+});
+
 router.get('/:countryCode/:sector', function(req, res) {
+	console.log("finding country and sector information");
 	var countryCode = req.params.countryCode;
 	var sector = req.params.sector;
 	console.log("Country: " + countryCode + " Sector: " + sector);
@@ -46,6 +56,9 @@ router.get('/:countryCode/:sector', function(req, res) {
 		});
 	};
 });
+
+
+
 
 /*
 // finish the function before returning the response

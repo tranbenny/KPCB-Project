@@ -164,7 +164,7 @@ function drawMap() {
 					"country" : country,
 					"sector" : Object.keys(sectorLocations[country][0])[0] 
 				};
-				$('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
+				// $('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
 				processResponse(information, countryInformation);
 			}
 		});
@@ -178,7 +178,7 @@ function drawMap() {
 
 // saves image data and saves loan information data
 function processLoan(loans) {
-	for (var i = 0; i < 20; i++) {
+	for (var i = 0; i < 50; i++) {
 		var loan = loans[i];
 		var country = loan.loan.location.country_code;
 		countries.push(country);
@@ -239,13 +239,36 @@ function findImpact(country, callback) {
 function processResponse(information, countryInformation) {
 	// countryInformation.sector
 	var image;
+	var name;
+	var activity;
+	var use;
 	sectorLocations[countryInformation.country].forEach(function(value, index, array) {
 		if (Object.keys(value)[0] == countryInformation.sector) {
+			console.log(value[countryInformation.sector]);
 			image = value[countryInformation.sector].image.id;
+			name = value[countryInformation.sector].name;
+			activity = value[countryInformation.sector].activity;
+			use = value[countryInformation.sector].use;
 		}
 	}); // array of objects
-	// <img src='http://www.kiva.org/img/s300/" + image + ".jpg'>"
-	$('#results').append("<div class='row'> <img src='http://www.kiva.org/img/s300/" + image + ".jpg'> </div>");
+	// add an item description next to the image 
+	$('#results').append("<h1 class='underline'>Loan Information</h1>")
+	$('#results').append("<div class='row' id='description'>" + 
+		"<div class='col-md-4'>" +
+			"<img src='http://www.kiva.org/img/s300/" + image + ".jpg'>" +
+		"</div>" +
+		"<div class='col-md-6'>" +
+			"<h5> Name: " + name + "</h5>" +
+			"<h5> Location: " + countryInformation.country + "</h5>" +
+			"<h5> Activity: " + activity + "</h5>" +
+			"<h5> Use: " + use + "</h5>" +
+		"</div>" +
+	"</div>");
+
+	$('#results').append(
+		"<h1 class='center' id='resultTitle'> Effect on " + countryInformation.sector + "/Employment in " +
+		countryInformation.country + " </h1>"
+	);
 
 	// Drawing the chart
 	var WIDTH = 800;

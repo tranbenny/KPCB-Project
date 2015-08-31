@@ -180,7 +180,7 @@ function mainFind(location, sector, callback) {
 		// query builder
 		// need to perform the api request to send back the data
 		var url = baseURL + location + endURLs[key];
-		console.log(url);
+		//console.log(url);
 		httpRequests(url, sum, results, callback);
 	}
 };
@@ -189,16 +189,32 @@ function httpRequests(url, sum, results, callback) {
 	request(url, function(err, res, body) {
 		if (!err && res.statusCode == 200) {
 			var data = JSON.parse(body);
-			console.log("Data: " + data);
+			//console.log("Data: " + data);
 			results["result"].push(data);
 		}
-		console.log(results["result"].length);
 		if (results["result"].length == sum) {
-			console.log("Sending the reponse back now!");
+			// console.log("Sending the reponse back now!");
 			callback(results);
 		} 
 	});
 }
+
+
+function userFind(username, callback) {
+	var url = "http://api.kivaws.org/v1/lenders/" + username + "/loans.json";
+	request(url, function(err, res, body) {
+		if (!err && res.statusCode == 200) {
+			var data = JSON.parse(body);
+			console.log("User data: " + data);
+			var result = { "result" : data };
+			callback(result);
+		} else {
+			var result = { "result" : "User not found" };
+			callback(result);
+		}
+	});
+};
+
 
 // the requests are getting the data, but it is not sending the response back. The methods are ending too quickly
 
@@ -206,7 +222,8 @@ function httpRequests(url, sum, results, callback) {
 var apiInfo = {
 	apiInfo : kivaCategories,
 	findInfo : findInfo,
-	mainFind : mainFind
+	mainFind : mainFind,
+	userFind : userFind
 };
 
 

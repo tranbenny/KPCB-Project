@@ -12,28 +12,38 @@
 	</head>
 
 	<body>
-		<nav class="navbar navbar-fixed-top navbar-inverse">
+		<nav class="navbar" id="navbar">
 			<div class="container">
 				<div class="navbar-header">
-					<a class="navbar-brand" href="#">KPCB Challenge </a>
+					<a class="navbar-brand" href="#">Kiva Impact</a>
 				</div>
 				<div id ="navbar" class="collapse navbar-collapse navbar-right">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="#">Home</a></li>
-						<li><a href="#">About</a></li>
+						<li><a href="#" id="about">About</a></li>
 					</ul>
 			</div>
 		</nav>
 
 
 		<div class="container">
+			<div class="row" id="search">
+				<div class="input-group">
+					<input type="text" class="form-control" id="username" placeholder="Enter username here">
+					<span class="input-group-btn">
+						<button id='searchButton' class="btn btn-default" type="button">Search</button>
+					</span>
+				</div>
+			</div>
+
+
+
 			<div class="row">	
 				<div id="mapdiv" style="width: 100%; height: 400px;"> 
 					<h3 id="load">Loading data...</h3>
 				</div>
 			</div>
 
-			<h3 class="center" id="resultTitle">Results</h3>
 			<div id="results" class="row">
 			</div>
 		</div>
@@ -43,7 +53,7 @@
     			<div class="modal-content">
     				<div class="modal-header">
     					<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-    					<h4 class="modal-title">Example Title</h4>
+    					<h4 class="modal-title">Kiva Impact Visualization</h4>
     				</div>
     				<div id="modal-body" class="modal-body">
     				</div>
@@ -64,6 +74,8 @@
 		<script type="text/javascript" src="js/ammap_amcharts_extension.js"></script>
 		<script type="text/javascript" src="js/worldHigh.js"></script>
 		<script type="text/javascript" src="js/loadMap.js"></script>
+		<script type="text/javascript" src="js/userSearch.js"></script>
+		<script type="text/javascript" src="js/aboutModal.js"></script>
 
 	</body>
 </html>
