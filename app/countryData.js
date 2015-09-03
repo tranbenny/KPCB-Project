@@ -1,3 +1,5 @@
+// country codes, latitude/longitude values for multiple countries
+
 var countryData = [
   {
      country:"country",

@@ -1,4 +1,4 @@
-// restful api routes
+// api routes
 
 var express = require('express');
 var router = express.Router();
@@ -8,11 +8,13 @@ var agInfo = require("../getInfo");
 // agInfo.apiInfo = kiva categories 
 // agInfo.findInfo(location, callback) : finds the appropriate information
 
+
 router.get('/', function(req, res) {
 	// need to configure this to send the index page 
 	res.send('Hello World, this is a different page');
 });
 
+// gets Kiva most recent Loans route
 router.get('/recentLoans', function(req, res) {
 	var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
 	agInfo.getRecentLoans(recentLoansURL, function(data) {
@@ -21,8 +23,7 @@ router.get('/recentLoans', function(req, res) {
 });
 
 
-// needs to send an array of countries
-// response sends back json object with country, latitude and longitude values
+// gets all the latitude/longitude values for countries
 router.get("/Location", function(req, res) {
 	var countries = req.query.countryNames; // object of country code names
 	var allCountries = locInfo.countryData; // array of objects
@@ -38,6 +39,8 @@ router.get("/Location", function(req, res) {
 	res.send(result);
 });
 
+
+// finds the loans for a specific user route
 router.get('/lendor/:username', function(req, res) {
 	console.log("finding username");
 	var username = req.params.username;
@@ -47,6 +50,8 @@ router.get('/lendor/:username', function(req, res) {
 	});
 });
 
+
+// finds the relevant World Bank API data for a country/sector 
 router.get('/:countryCode/:sector', function(req, res) {
 	console.log("finding country and sector information");
 	var countryCode = req.params.countryCode;
@@ -63,18 +68,6 @@ router.get('/:countryCode/:sector', function(req, res) {
 		});
 	};
 });
-
-
-
-
-/*
-// finish the function before returning the response
-router.get('/Agriculture', function(req, res) {
-	var location = req.query.location;
-	agInfo.findInfo(location, function(data) {
-		res.send(data); // sends string
-	});
-});*/
 
 
 module.exports = router;
@@ -114,45 +107,5 @@ Trends Available:
 
 
 
-/*
-var kivaCategories = {
-	"Agriculture" : {
-		"World Bank" : "Agriculture & Rural Development" 
-		// variables: crop production index, agriculture value added?\
-		"World Bank" : "Economy & Growth" // agriculture, value added
-		"World Bank" : "Gender" // % employments in agriculture for male and female
- 	},
-	"Women" : {
-		"World Bank" : "Gender" // children in employment, female
-		// long term unemployment, female 
-		// children in employment, study and work : female 
-		// employees, female
-	}, 
-	"Education" : {
-		"World Bank" : "Education", 
-		// children out of school, literacy rate, persistence to last grade of primary
-		// primary completion rate
-		// progression to secondary school 
-		// school enrollment
-		// unemployment rate 
-		"World Bank" : "Gender" // Literacy rates for youth female and youth males
-	},
-	"Health" : {
-		"World Bank" : "Agriculture", // improved water source ?
-		"World Bank" : "Aid Effectiveness", // improved sanitation facilities
-		// life expenctancy at birth, malnutrition prevalence, mortality rate
-		"World Bank" : "Gender", // : Life Expectancy at birth, female and male
-		"World Bank" : "Infrastructure" // improved water sources, rural and urban
-	},
-	"Single Parents" : {
-		"World Bank" : "Aid Effectiveness" // Maternal mortality rate, teenage mothers
-		// pregnant women receiving prenatal care 
-	}, 
-	"Shelter" : {},
-	"Retail Businesses" : {},
-	"Food" : {}
-};
-
-*/
 
 
