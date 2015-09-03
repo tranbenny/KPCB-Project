@@ -7,17 +7,9 @@ var api = require('./app/routes/apiRoutes');
 var port = process.env.PORT || 3000; 
 
 app.use(express.static(__dirname + '/public'));
-// app.use(bodyParser());
 
 app.use('/', mainPageRoutes);
 app.use('/api', api);
-
-/*
-app.get('/', function(req, res) {
-	res.send('Hello World!');
-});*/
-
-
 
 var server = app.listen(port, function() {
 	var host = server.address().address;

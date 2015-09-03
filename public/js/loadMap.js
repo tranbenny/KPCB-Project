@@ -59,16 +59,18 @@ var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
 var sectorLocations = {}; 
 var countryCodes = {};
 
-findAllInformation(gatherLocations);
+findAllInformation();
 
-function findAllInformation(callback) {
+function findAllInformation() {
 	var loadLoanOptions = {
 		type : "GET", 
 		dataType : "json", 
 		success : function(result) {
 			var loans = result.result.lending_actions;
+			/*
 			processLoan(loans);
-			callback();
+			callback(); */
+			var recentLoanMap = new Map(loans);
 		},
 		error : function(err) {
 			console.log("Error occured" + err);
@@ -78,7 +80,7 @@ function findAllInformation(callback) {
 	$.ajax("/api/recentLoans", loadLoanOptions);
 };
 
-
+/*
 function drawMap() {
 	var map = new AmCharts.AmMap();
 	map.pathToImages = "css/images/";
@@ -154,7 +156,7 @@ function drawMap() {
 		// $('#modal-body').append("<img src='http://www.kiva.org/img/s300/" + image + ".jpg'>");
 		$('#myModal').modal('show');
 		
-		*/
+		
 		var result = findImpact(country, function(data) {
 			if (Object.keys(data).indexOf("message") != -1) {
 				$('#results').append('<h3 class="center">Sorry the data for this sector has not yet been loaded</h3>');
@@ -173,9 +175,13 @@ function drawMap() {
 	map.write("mapdiv");
 };
 
+*/
+
 /////////////////////////////////////////////////////////////////////////////
 // click functions 
 
+
+/*
 // saves image data and saves loan information data
 function processLoan(loans) {
 	for (var i = 0; i < 50; i++) {
@@ -208,7 +214,9 @@ function gatherLocations() {
 	});
 }
 
+*/
 
+/*
 // needs country location
 // sends ajax request to fetch country/sector statistics
 // success function needs to return appropriate html code
@@ -368,7 +376,7 @@ function processResponse(information, countryInformation) {
 }
 
 
-
+*/
 
 
 
