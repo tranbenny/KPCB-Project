@@ -1,29 +1,9 @@
-// Errors/Conditions to fix: 
-// need to account for if sector is undefined in a country
-// fix latitude/longitude values for Samoa
-// need to fix null value iterations
-
-
-// Features/Functions to add:
-
-// figure out how to deal with undefined values
-// need to add more world bank information
-
-
-// add more things to be loaded for each sector
-// How do I want to load unknown values?
-
-// Customize navigation bar 
-// Create the theme to match website
-// load user profiles instead of all the loans
-// clean up code
+// loads recent loans onto map on web page
+// ends ajax requests when a new one is made
 
 
 
-//////////////////////////////////////////
 // handle ajax requests
-
-
 // handling multiple ajax requests that pend for too long
 // this needs to filter so that the abort function only deletes the most recent one
 var xhrPool = [];
@@ -46,9 +26,8 @@ function abort() {
 	});
 }
 
-///////////////////////////////////////////
-// draw map on load
-
+// finds most recent loans and draws map on load
+// adds user click function to search button
 (function() {
 	findAllInformation();
 	$('#searchButton').click(function() {
@@ -58,14 +37,13 @@ function abort() {
 	});
 })();
 
-
+// finds the most recent loans made on Kiva
 function findAllInformation() {
 	var loadLoanOptions = {
 		type : "GET", 
 		dataType : "json", 
 		success : function(result) {
 			var loans = result.result.lending_actions;
-			console.log(loans);
 			var recentLoanMap = new Map(loans, false);
 		},
 		error : function(err) {
@@ -77,7 +55,7 @@ function findAllInformation() {
 };
 
 
-// find all the loans corresponding to a lender 
+// find all the loans corresponding to a searched lender 
 function search() {
 	var username = $('#username').val();
 	var url = "/api/lendor/" + username;
@@ -86,7 +64,6 @@ function search() {
 		dataType : "json", 
 		success : function(result) {
 			var loans = result.result.loans;
-			console.log(loans);
 			var userMap = new Map(loans, true, username);
 		},
 		error : function(err) {

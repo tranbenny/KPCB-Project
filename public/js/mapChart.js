@@ -1,13 +1,15 @@
 // map object
-// should take an array of loans as a parameter 
+// takes an array of loans, boolean value if the loans are specific to one user, and a username as parameters
+// draws map onto the webpage
 
+
+// Map Object constructor 
 function Map(loans, userSpecific, username) {
-	// loans should be an array of loan objects
-	this.loans = loans;
-	this.specificUser = userSpecific; // true or false
-	this.username = username;
+	this.loans = loans; // array of loan objects
+	this.specificUser = userSpecific; // true or false if loans are all by one user
+	this.username = username; // username of loans passed
 
-	// anonymous function called when a new map is created
+	// creates new map on load and adds click function
 	(function () {
 		var loanInformation = {}; // Key: UserID, Value: Array of loans
 		var countries = []; // array of all countries
@@ -65,6 +67,7 @@ function Map(loans, userSpecific, username) {
 			});
 		}
 
+		// configures and draws amChart map onto web page
 		function drawMap() {
 			var map = new AmCharts.AmMap();
 			map.pathToImages = "css/images/";
@@ -108,16 +111,13 @@ function Map(loans, userSpecific, username) {
 			
 			map.dataProvider = dataProvider;
 
-			
 			map.areasSettings = {
 				autoZoom : false,
 				selectedColor: "#CC000",
 				selectable : true,
 			};
 
-			// when i click i also want to add the image 
-			// when i hover over a country, display user and sector
-			// given the country, find the correct image 
+			// adds click function to loan countries on map
 			map.addListener("clickMapObject", function(event) {
 				abort(); // ends previous ajax requests
 				$('#results').empty(); 
@@ -137,7 +137,6 @@ function Map(loans, userSpecific, username) {
 							"country" : country,
 							"sector" : Object.keys(sectorLocations[country][0])[0] 
 						};
-						// $('#results').append("<h1 class='center'> " + countryInformation.sector + " in " + country + "</h1>");
 						processResponse(information, countryInformation);
 					}
 				});
@@ -146,9 +145,7 @@ function Map(loans, userSpecific, username) {
 			map.write("mapdiv");
 		};
 
-		// needs country location
-		// sends ajax request to fetch country/sector statistics
-		// success function needs to return appropriate html code
+		// finds the relevant information from WorldBank API for a specific country/sector
 		function findImpact(country, callback) {
 			var sectors = sectorLocations[country]; // this is an array of objects
 			var sector = Object.keys(sectors[0])[0];
@@ -170,6 +167,7 @@ function Map(loans, userSpecific, username) {
 			$.ajax("/api/" + countryCode + "/" + sector, requestOptions);
 		}
 
+		// loads country/sector information onto a graph in the results section of the web page
 		function processResponse(information, countryInformation) {
 			var image;
 			var name;
@@ -183,8 +181,7 @@ function Map(loans, userSpecific, username) {
 					activity = value[countryInformation.sector].activity;
 					use = value[countryInformation.sector].use;
 				}
-			}); // array of objects
-			// add an item description next to the image 
+			}); 
 			$('#results').append("<h1 class='underline'>Loan Information</h1>")
 			$('#results').append("<div class='row' id='description'>" + 
 				"<div class='col-md-4'>" +
@@ -203,7 +200,7 @@ function Map(loans, userSpecific, username) {
 				countryInformation.country + " </h1>"
 			);
 
-			// Drawing the chart
+			// chart dimensions
 			var WIDTH = 800;
 			var HEIGHT = 500;
 			var MARGINS = {
@@ -214,8 +211,6 @@ function Map(loans, userSpecific, username) {
 			};
 
 			information.forEach(function(value, index, array) {
-				// information should contain two arrays of size 2 that contain two different variables
-				// sometimes title values are null
 				try {
 					var title = value[1][0].indicator.value; // y-value
 				} catch(err) {
@@ -225,7 +220,7 @@ function Map(loans, userSpecific, username) {
 				$('#results').append('<div class="row"><svg id="' + chartId + '"></svg>');
 				countryInformation[title] = [];
 			
-				var coreInformation = value[1]; // this is an array of objects
+				var coreInformation = value[1]; 
 				
 				var yMin = 0;
 				var yMax = 0;
@@ -301,8 +296,6 @@ function Map(loans, userSpecific, username) {
 		}
 
 	})();
-
-
 }
 
 Map.prototype = {

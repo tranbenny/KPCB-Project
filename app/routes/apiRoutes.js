@@ -1,4 +1,4 @@
-// restful api routes
+// api routes
 
 var express = require('express');
 var router = express.Router();
@@ -8,11 +8,13 @@ var agInfo = require("../getInfo");
 // agInfo.apiInfo = kiva categories 
 // agInfo.findInfo(location, callback) : finds the appropriate information
 
+
 router.get('/', function(req, res) {
 	// need to configure this to send the index page 
 	res.send('Hello World, this is a different page');
 });
 
+// gets Kiva most recent Loans route
 router.get('/recentLoans', function(req, res) {
 	var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
 	agInfo.getRecentLoans(recentLoansURL, function(data) {
@@ -21,8 +23,7 @@ router.get('/recentLoans', function(req, res) {
 });
 
 
-// needs to send an array of countries
-// response sends back json object with country, latitude and longitude values
+// gets all the latitude/longitude values for countries
 router.get("/Location", function(req, res) {
 	var countries = req.query.countryNames; // object of country code names
 	var allCountries = locInfo.countryData; // array of objects
@@ -38,6 +39,8 @@ router.get("/Location", function(req, res) {
 	res.send(result);
 });
 
+
+// finds the loans for a specific user route
 router.get('/lendor/:username', function(req, res) {
 	console.log("finding username");
 	var username = req.params.username;
@@ -47,6 +50,8 @@ router.get('/lendor/:username', function(req, res) {
 	});
 });
 
+
+// finds the relevant World Bank API data for a country/sector 
 router.get('/:countryCode/:sector', function(req, res) {
 	console.log("finding country and sector information");
 	var countryCode = req.params.countryCode;

@@ -1,15 +1,5 @@
-// sectors to add:
-// Education, Services, Food, Manufacturing, Clothing, Transportation, Arts
-// Retail, Construction 
-
-// need to add housing
-
-
-// configure all the methods to get all the relevant agricultural information
-// configure it all into fields and methods, similar to OOP principles 
 var request = require('request');
 var countryData = require('./countryData');
-// var results = { "result" : [] };
 
 // map relevant data from other API's to information about loan
 var apiInfo= {
@@ -17,6 +7,7 @@ var apiInfo= {
 	 // crop production index, food production index, agriculture value added per worker
 };
 
+// World Bank categories mapped to Kiva categories
 var kivaCategories = {
 	"Agriculture" : {
 		"World Bank" : [
@@ -66,12 +57,10 @@ var kivaCategories = {
 	// "Food" : {}
 };
 
-// url for agriculture definition by world bank
-var defURl = "http://api.worldbank.org/topic/1?per_page=100&format=json";
 
+var baseURL = "http://api.worldbank.org/countries/"; // beginning URL for world bank api call
 
-var baseURL = "http://api.worldbank.org/countries/";
-
+// URL ends of world bank API calls
 var worldBankEndURLS = {
 	// Agriculture :
 	"Agriculture" : { 
@@ -147,6 +136,8 @@ var worldBankEndURLS = {
 
 var EXendURL = "/indicators/AG.PRD.CROP.XD?per_page=100&date=2000:2015&format=json";
 
+
+// World Bank API call for agricultural crop production index information
 function findInfo(location, callback) {
 	var url = baseURL + location + EXendURL;
 	request(url, function(err, res, body) {
@@ -157,49 +148,44 @@ function findInfo(location, callback) {
 	});
 }
 
+// loads year and crop production index value into a result
 function extractInfo(data) {
-	// data = array
 	var info = data[1];
 	var result = "Data" + "\n";
 	info.forEach(function(value, index, array) {
-		// value = object
 		if (value.value != null) {
 			result = result + "Year: " + value.date + ", Index Value: " + value.value + "\n";
 		}
 	});
-	return(result); // string
+	return(result); 
 };
 
-// figure out a way to send back the data response after multiple requests 
+// World Bank API call that finds all the data related to a kiva category
 function mainFind(location, sector, callback) {
 	var endURLs = worldBankEndURLS[sector]; // object with various keys and end urls
 	var sum = Object.keys(endURLs).length;
 	var results = {"result" : []};
-	// for loop needs to contain a method for http requests
 	for (var key in endURLs) {
-		// query builder
-		// need to perform the api request to send back the data
 		var url = baseURL + location + endURLs[key];
-		//console.log(url);
 		httpRequests(url, sum, results, callback);
 	}
 };
 
+// multiple world bank api requests
+// callback method runs when all requests are finished
 function httpRequests(url, sum, results, callback) {
 	request(url, function(err, res, body) {
 		if (!err && res.statusCode == 200) {
 			var data = JSON.parse(body);
-			//console.log("Data: " + data);
 			results["result"].push(data);
 		}
 		if (results["result"].length == sum) {
-			// console.log("Sending the reponse back now!");
 			callback(results);
 		} 
 	});
 }
 
-
+// Kiva API call to find the loans of a specific user
 function userFind(username, callback) {
 	var url = "http://api.kivaws.org/v1/lenders/" + username + "/loans.json";
 	request(url, function(err, res, body) {
@@ -215,6 +201,7 @@ function userFind(username, callback) {
 	});
 };
 
+// Kiva API call to find the most recent loans made
 function getRecentLoans(url, callback) {
 	request(url, function(err, res, body) {
 		if (!err && res.statusCode == 200) {
@@ -228,8 +215,6 @@ function getRecentLoans(url, callback) {
 	});
 }
 
-// the requests are getting the data, but it is not sending the response back. The methods are ending too quickly
-
 
 var apiInfo = {
 	apiInfo : kivaCategories,
@@ -238,9 +223,6 @@ var apiInfo = {
 	userFind : userFind,
 	getRecentLoans : getRecentLoans
 };
-
-
-
 
 
 
