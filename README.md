@@ -1,6 +1,7 @@
 # Kiva Impact Graph Visual
 
 Submission to KPCB Build for Good Challenge <br />
+http://kpcbfellows.com/challenges/kiva <br />
 
 Challenge: Create some form of application that allows a Lender to determine the impact that their loans are having by combining publicly available sources. <br />
 
