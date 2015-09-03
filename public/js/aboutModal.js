@@ -9,13 +9,6 @@ $('#about').click(function() {
 	"<a href='http://data.worldbank.org/'>http://data.worldbank.org/</a>"
 	);
 
-
-
-
-
-
-
-
 	$('#myModal').modal('show');
 });
 

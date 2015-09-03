@@ -1,19 +1,17 @@
 // map object
 // should take an array of loans as a parameter 
 
-function Map(loans, number, user) {
+function Map(loans, userSpecific, username) {
 	// loans should be an array of loan objects
 	this.loans = loans;
-	this.number = number;
-	this.user = user;
+	this.specificUser = userSpecific; // true or false
+	this.username = username;
 
 	// anonymous function called when a new map is created
 	(function () {
 		var loanInformation = {}; // Key: UserID, Value: Array of loans
 		var countries = []; // array of all countries
 		var countryLocations = {}; // Key : countries, value : longitude/latitude values 
-		// returns most recent loans made 
-		var recentLoansURL = "http://api.kivaws.org/v1/lending_actions/recent.json";
 		// Key : country, value : Array of objects, the objects need to include the sector, loan information, user ID 
 		var sectorLocations = {}; 
 		var countryCodes = {};
@@ -21,19 +19,30 @@ function Map(loans, number, user) {
 		main();
 
 		function main() {
-			processLoans(loans, number);
+			processLoans(loans);
 			gatherLocations();
 		}
 
 		function processLoans(loans) {
-			for (var i = 0; i < 50; i++) {
-				var loan = loans[i];
-				var country = loan.loan.location.country_code;
+			if (userSpecific == false) {
+				var number = 50;
+			} else {
+				var number = loans.length;
+			}
+			for (var i = 0; i < number; i++) {
+				if (userSpecific == false) {
+					var loan = loans[i].loan;
+					var user = loans[i].lender.lender_id;
+				} else {
+					var loan = loans[i];
+					var user = username;
+				}
+				var country = loan.location.country_code;
 				countries.push(country);
-				if (loan.lender.lender_id in loanInformation) {
-					loanInformation[loan.lender.lender_id].push(loan.loan);
+				if (user in loanInformation) {
+					loanInformation[user].push(loan);
 				} else {	
-					loanInformation[loan.lender.lender_id] = [loan.loan];
+					loanInformation[user] = [loan];
 				}
 			}
 		}
